@@ -8,10 +8,15 @@ Created on Fri Apr 16 17:38:18 2021
 """
 
 # Script for MMS in OpenFOAM
+import os
 import sympy as sym
 from sympy import sin, cos, exp, pi, sqrt
 import pyMMSFoam as mms
 from pyMMSFoam import x,y,z,t
+
+CASE_DIR = "//wsl.localhost/Ubuntu-22.04/home/samiera/OpenFOAM/samiera-v2412/run/simpleFoam/mako_test"
+SYS_DIR = os.path.join(CASE_DIR, "system")
+ZERO_DIR = os.path.join(CASE_DIR, "0")
 
 Re = 5
 Lambda = (Re/2) - sqrt( (Re**2/4) + 4*pi**2 )
@@ -29,20 +34,46 @@ R = nu*(mms.grad(U) + mms.grad(U).T)
 
 S = mms.div(U*U.T) - mms.div(R) + mms.grad(p)
 
-# # Uncomment what is needed
-
 # # Generate fvOptions
-# mms.generateFvOptions(S, "momentumSource", "U")
+mms.generateFvOptions(S, "momentumSource", "U", filepath=os.path.join(SYS_DIR, "fvOptions"))
 
 # # Generate boundary conditions
-# # Velocity
+
+U_patches = {
+    'inlet':  ('dirichlet', U),
+    'outlet': ('neumann',   U),
+    'walls':  ('dirichlet', U),
+}
+
+mms.generateBoundaryField(
+    "U", U_patches,
+    dimensions="[0 1 -1 0 0 0 0]",
+    initial_value="(0 0 0)",
+    field_class="volVectorField",
+    filepath=os.path.join(ZERO_DIR, "U"),
+)
+
+p_patches = {
+    'inlet':  ('neumann',   p),
+    'outlet': ('dirichlet', p),
+    'walls':  ('neumann',   p),
+}
+mms.generateBoundaryField(
+    "p", p_patches,
+    dimensions="[0 2 -2 0 0 0 0]",
+    initial_value="0",
+    field_class="volScalarField",
+    filepath=os.path.join(ZERO_DIR, "p"),
+)
+
+# # # Velocity
 # mms.generateDirichletBoundaries(U, "U")
 # mms.generateNeumannBoundaries(U, "U")
 
-# # Pressure
+# # # Pressure
 # mms.generateDirichletBoundaries(p, "p")
 # mms.generateNeumannBoundaries(p, "p")
 
 # # Generate functionObjects
-# mms.generateFunctionObject(U, "U")
-# mms.generateFunctionObject(p, "p")
+mms.generateFunctionObject(U, "U", filepath=os.path.join(SYS_DIR,"function_U"))
+mms.generateFunctionObject(p, "p", filepath=os.path.join(SYS_DIR, "function_p"))
