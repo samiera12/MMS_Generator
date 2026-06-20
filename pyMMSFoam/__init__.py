@@ -10,5 +10,5 @@ from .symbols import x,y,z,t
 from .checks import checkInput
 from .differentialOperators import ddt, grad, div, laplacian
 from .generateCCode import generateCcode
-from .printUtilities import generateDirichletBoundaries, generateNeumannBoundaries, generateFunctionObject, generateFvOptions
+from .printUtilities import generateDirichletBoundaries, generateNeumannBoundaries, generateFunctionObject, generateFvOptions, generateBoundaryField
 from .plotting import plot
