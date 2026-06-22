@@ -37,9 +37,9 @@ ${data['patch_name']}
             % endif
             
             % if data['is_vector']:
-            const scalar normal_1 = vector(${data['var_name']}1_xx, ${data['var_name']}1_xy, ${data['var_name']}1_xz) & nf[faceI];
-            const scalar normal_2 = vector(${data['var_name']}2_yx, ${data['var_name']}2_yy, ${data['var_name']}2_yz) & nf[faceI];
-            const scalar normal_3 = vector(${data['var_name']}3_zx, ${data['var_name']}3_zy, ${data['var_name']}3_zz) & nf[faceI];
+            const scalar normal_1 = vector(d${data['var_name']}1_dx, d${data['var_name']}1_dy, d${data['var_name']}1_dz) & nf[faceI];
+            const scalar normal_2 = vector(d${data['var_name']}2_dx, d${data['var_name']}2_dy, d${data['var_name']}2_dz) & nf[faceI];
+            const scalar normal_3 = vector(d${data['var_name']}3_dx, d${data['var_name']}3_dy, d${data['var_name']}3_dz) & nf[faceI];
             const vector normalGradient (normal_1, normal_2, normal_3);
             % endif
             
