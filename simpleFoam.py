@@ -40,9 +40,10 @@ mms.generateFvOptions(S, "momentumSource", "U", filepath=os.path.join(SYS_DIR, "
 # # Generate boundary conditions
 
 U_patches = {
-    'inlet':  ('dirichlet', U),
-    'outlet': ('neumann',   U),
-    'walls':  ('dirichlet', U),
+    'top':  ('dirichlet', U),
+    'bottom': ('dirichlet', U),
+    'left':  ('dirichlet', U),
+    'right': ('neumann', U),
 }
 
 mms.generateBoundaryField(
@@ -54,9 +55,10 @@ mms.generateBoundaryField(
 )
 
 p_patches = {
-    'inlet':  ('neumann',   p),
-    'outlet': ('dirichlet', p),
-    'walls':  ('neumann',   p),
+    'top':  ('neumann',   p),
+    'bottom': ('neumann', p),
+    'left':  ('neumann',   p),
+    'right': ('dirichlet', p),
 }
 mms.generateBoundaryField(
     "p", p_patches,
