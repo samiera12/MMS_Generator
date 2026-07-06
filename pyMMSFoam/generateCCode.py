@@ -98,6 +98,6 @@ def generateCcode(expression, solutionName, tempVarName='tmp', vectorNotation=Fa
     for i in range(len(lines)):   
         for j in range(len(functions)):
             lines[i] = re.sub(r'\b{}\b'.format(functions[j]), "Foam::"+functions[j], lines[i])
-        lines[i] = "{0}const scalar " + lines[i] + " \n"
+        lines[i] = "const scalar " + lines[i] + " \n"
 
     return "".join(lines)    

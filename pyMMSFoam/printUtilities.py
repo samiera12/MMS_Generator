@@ -105,59 +105,17 @@ def generateNeumannBoundaries(MMS, solutionName, patchName, tempVarName='tmp', _
     return rendered
 
 
-def generateBoundaryField(solutionName, patches, dimensions, initial_value,
-                           field_class, filepath=None, tempVarName='tmp'):
+def generateBoundaryField(MMS, solutionName, patches, dimensions, initial_value, field_class, filepath=None, tempVarName='tmp'):
     blocks = []
-    for patchName, (bcType, expr) in patches.items():
-        if bcType == 'dirichlet':
-            block = generateDirichletBoundaries(expr, solutionName, patchName,
-                                                 tempVarName=tempVarName, _print=False)
-        elif bcType == 'neumann':
-            block = generateNeumannBoundaries(expr, solutionName, patchName,
-                                               tempVarName=tempVarName, _print=False)
-        else:
-            raise ValueError(f"Unknown bc_type '{bcType}' for patch '{patchName}'. "
-                              "Use 'dirichlet' or 'neumann'.")
-        blocks.append(block)
-
-    boundaries_content = "\n".join(blocks)
-    # Indent the assembled patch blocks under boundaryField { ... }
-    boundaries_content = "\n".join(
-        ("    " + line if line.strip() else line)
-        for line in boundaries_content.splitlines()
-    )
-
-    data = {
-        'var_name': solutionName,
-        'field_class': field_class,
-        'dimensions': dimensions,
-        'initial_value': initial_value,
-        'boundaries_content': boundaries_content,
-    }
-
-    template = Template(filename=os.path.join(TEMPLATE_DIR, '0_field.mako'))
-    rendered_output = template.render(data=data)
-
-    if filepath:
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        with open(filepath, 'w') as f:
-            f.write(rendered_output)
-        print(f"{solutionName} field generated at: {filepath}")
-    else:
-        print(rendered_output)
-
-    return rendered_output
-
-
-def generateBoundaryField(solutionName, patches, dimensions, initial_value, field_class, filepath=None, tempVarName='tmp'):
-    blocks = []
-    for patchName, (bcType, MMS) in patches.items():
+    for patchName, bcType in patches.items():
         if bcType == 'dirichlet':
             block = generateDirichletBoundaries(MMS, solutionName, patchName,
                                                  tempVarName=tempVarName, _print=False)
         elif bcType == 'neumann':
             block = generateNeumannBoundaries(MMS, solutionName, patchName,
                                                tempVarName=tempVarName, _print=False)
+        elif bcType == 'empty':
+            block = f"{patchName}\n{{\n    type            empty;\n}}"
         else:
             raise ValueError(f"Unknown bc_type '{bcType}' for patch '{patchName}'. "
                               "Use 'dirichlet' or 'neumann'.")
