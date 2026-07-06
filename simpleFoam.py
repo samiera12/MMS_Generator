@@ -14,7 +14,7 @@ from sympy import sin, cos, exp, pi, sqrt
 import pyMMSFoam as mms
 from pyMMSFoam import x,y,z,t
 
-CASE_DIR = "//wsl.localhost/Ubuntu-22.04/home/samiera/OpenFOAM/samiera-v2412/run/simpleFoam/mako_test"
+CASE_DIR = "//wsl.localhost/Ubuntu-22.04/home/samiera/OpenFOAM/samiera-v2412/run/simpleFoam/subprocess"
 SYS_DIR = os.path.join(CASE_DIR, "system")
 ZERO_DIR = os.path.join(CASE_DIR, "0")
 
@@ -28,7 +28,7 @@ p = 0.5*(1-exp(2*Lambda*x))
 U = sym.Matrix([u,v,w])
 
 # Momentum balance equation
-nu = 0.01
+nu = 1/Re
 
 R = nu*(mms.grad(U) + mms.grad(U).T)
 
@@ -39,29 +39,49 @@ mms.generateFvOptions(S, "momentumSource", "U", filepath=os.path.join(SYS_DIR, "
 
 # # Generate boundary conditions
 
+# U_patches = {
+#     'top':  ('dirichlet', U),
+#     'bottom': ('dirichlet', U),
+#     'left':  ('dirichlet', U),
+#     'right': ('neumann', U),
+#     'front': ('empty', None),
+#     'back': ('empty', None),
+# }
 U_patches = {
-    'top':  ('dirichlet', U),
-    'bottom': ('dirichlet', U),
-    'left':  ('dirichlet', U),
-    'right': ('neumann', U),
+    'top': 'dirichlet',
+    'bottom': 'dirichlet',
+    'left': 'dirichlet',
+    'right': 'neumann',
+    'front': 'empty',
+    'back': 'empty'
 }
 
 mms.generateBoundaryField(
-    "U", U_patches,
+    U, "U", U_patches,
     dimensions="[0 1 -1 0 0 0 0]",
-    initial_value="(0 0 0)",
+    initial_value="(1 0 0)",
     field_class="volVectorField",
     filepath=os.path.join(ZERO_DIR, "U"),
 )
 
+# p_patches = {
+#     'top':  ('neumann', p),
+#     'bottom': ('neumann', p),
+#     'left':  ('neumann', p),
+#     'right': ('dirichlet', p),
+#     'front': ('empty', None),
+#     'back': ('empty', None),
+# }
 p_patches = {
-    'top':  ('neumann',   p),
-    'bottom': ('neumann', p),
-    'left':  ('neumann',   p),
-    'right': ('dirichlet', p),
+    'top': 'neumann',
+    'bottom': 'neumann',
+    'left': 'neumann',
+    'right': 'dirichlet',
+    'front': 'empty',
+    'back': 'empty',
 }
 mms.generateBoundaryField(
-    "p", p_patches,
+    p, "p", p_patches,
     dimensions="[0 2 -2 0 0 0 0]",
     initial_value="0",
     field_class="volScalarField",
