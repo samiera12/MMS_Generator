@@ -52,8 +52,13 @@ $$S=\nabla\cdot(UU^{T})-\nabla\cdot R+\nabla p$$
 Using pyMMSFoam, the user passes these expressions into the generation functions. The tool automatically maps the mathematical inputs to the Mako templates, rapidly outputting a `system/fvOptions` file, complete `0/U` and `0/p` initializations, and runtime `functionObjects`. This allows the user to immediately run the solver and evaluate spatial convergence without writing a single line of C++ by hand.
 
 ---
+### Workflow Automation via `subprocess`
 
-### 2. Steps to Implement
+With case-file generation now handled by `Mako`, pyMMSFoam also uses Python's `subprocess` module to automate the rest of the OpenFOAM workflow. A single command now renders the templates, runs `blockMesh` and the solver, and parses the `functionObjects` output to extract the L1​, L2​, and L∞​ error norms — letting full multi-refinement MMS studies run end-to-end without manual intervention between steps.
+
+---
+
+### Steps to Implement
 
 1. **Define your Equations:** Open the primary Python execution script and input your desired analytical fields (e.g., $U$, $p$, $T$) using standard SymPy notation.
 2. **Execute pyMMSFoam:** Run the script to initiate the workflow. The tool will parse your equations, calculate analytical derivatives, and isolate the source terms.
